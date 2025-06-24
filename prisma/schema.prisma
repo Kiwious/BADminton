@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
@@ -10,3 +7,97 @@ datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Player {
+  id         Int       @id @default(autoincrement())
+  name       String
+  gender     Gender
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+
+  pauses     Pause[]
+  rankings   Ranking[]
+  
+  // Match relations
+  team1Player1Matches Match[] @relation("Team1Player1")
+  team1Player2Matches Match[] @relation("Team1Player2")
+  team2Player1Matches Match[] @relation("Team2Player1")
+  team2Player2Matches Match[] @relation("Team2Player2")
+}
+
+model Pause {
+  id        Int      @id @default(autoincrement())
+  player    Player   @relation(fields: [playerId], references: [id])
+  playerId  Int
+  start     DateTime
+  end       DateTime?
+}
+
+model Round {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+
+  matches   Match[]
+  rankings  Ranking[]
+}
+
+model Match {
+  id         Int       @id @default(autoincrement())
+  round      Round     @relation(fields: [roundId], references: [id])
+  roundId    Int
+
+  team1Player1   Player @relation("Team1Player1", fields: [team1Player1Id], references: [id])
+  team1Player1Id Int
+
+  team1Player2   Player @relation("Team1Player2", fields: [team1Player2Id], references: [id])
+  team1Player2Id Int
+
+  team2Player1   Player @relation("Team2Player1", fields: [team2Player1Id], references: [id])
+  team2Player1Id Int
+
+  team2Player2   Player @relation("Team2Player2", fields: [team2Player2Id], references: [id])
+  team2Player2Id Int
+
+  sets        Set[]
+  winnerTeam  Int?    // 1 or 2
+  finished    Boolean @default(false)
+
+  @@index([roundId])
+}
+
+model Set {
+  id         Int     @id @default(autoincrement())
+  match      Match   @relation(fields: [matchId], references: [id])
+  matchId    Int
+  team1Score Int
+  team2Score Int
+  setNumber  Int
+
+  @@unique([matchId, setNumber])
+  @@index([matchId])
+}
+
+model Ranking {
+  id        Int     @id @default(autoincrement())
+  player    Player  @relation(fields: [playerId], references: [id])
+  playerId  Int
+
+  round     Round   @relation(fields: [roundId], references: [id])
+  roundId   Int
+
+  points    Int     @default(0)
+  wins      Int     @default(0)
+  losses    Int     @default(0)
+
+  @@index([playerId])
+  @@index([roundId])
+}
+
+//https://prismaliser.app?code=Z2VuZXJhdG9yIGNsaWVudCB7CiAgcHJvdmlkZXIgPSAicHJpc21hLWNsaWVudC1qcyIKICBvdXRwdXQgICA9ICIuLi9hcHAvZ2VuZXJhdGVkL3ByaXNtYSIKfQoKZGF0YXNvdXJjZSBkYiB7CiAgcHJvdmlkZXIgPSAic3FsaXRlIgogIHVybCAgICAgID0gImZpbGU6Li9kZXYuZGIiCn0KCmVudW0gR2VuZGVyIHsKICBNQUxFCiAgRkVNQUxFCiAgT1RIRVIKfQoKbW9kZWwgUGxheWVyIHsKICBpZCAgICAgICAgSW50ICAgICAgQGlkIEBkZWZhdWx0KGF1dG9pbmNyZW1lbnQoKSkKICBuYW1lICAgICAgU3RyaW5nCiAgZ2VuZGVyICAgIEdlbmRlcgogIGlzQWN0aXZlICBCb29sZWFuICBAZGVmYXVsdCh0cnVlKQogIGNyZWF0ZWRBdCBEYXRlVGltZSBAZGVmYXVsdChub3coKSkKCiAgcGF1c2VzICAgUGF1c2VbXQogIHJhbmtpbmdzIFJhbmtpbmdbXQoKICAvLyBNYXRjaCByZWxhdGlvbnMKICB0ZWFtMVBsYXllcjFNYXRjaGVzIE1hdGNoW10gQHJlbGF0aW9uKCJUZWFtMVBsYXllcjEiKQogIHRlYW0xUGxheWVyMk1hdGNoZXMgTWF0Y2hbXSBAcmVsYXRpb24oIlRlYW0xUGxheWVyMiIpCiAgdGVhbTJQbGF5ZXIxTWF0Y2hlcyBNYXRjaFtdIEByZWxhdGlvbigiVGVhbTJQbGF5ZXIxIikKICB0ZWFtMlBsYXllcjJNYXRjaGVzIE1hdGNoW10gQHJlbGF0aW9uKCJUZWFtMlBsYXllcjIiKQp9Cgptb2RlbCBQYXVzZSB7CiAgaWQgICAgICAgSW50ICAgICAgIEBpZCBAZGVmYXVsdChhdXRvaW5jcmVtZW50KCkpCiAgcGxheWVyICAgUGxheWVyICAgIEByZWxhdGlvbihmaWVsZHM6IFtwbGF5ZXJJZF0sIHJlZmVyZW5jZXM6IFtpZF0pCiAgcGxheWVySWQgSW50CiAgc3RhcnQgICAgRGF0ZVRpbWUKICBlbmQgICAgICBEYXRlVGltZT8KfQoKbW9kZWwgUm91bmQgewogIGlkICAgICAgICBJbnQgICAgICBAaWQgQGRlZmF1bHQoYXV0b2luY3JlbWVudCgpKQogIG5hbWUgICAgICBTdHJpbmcKICBjcmVhdGVkQXQgRGF0ZVRpbWUgQGRlZmF1bHQobm93KCkpCgogIG1hdGNoZXMgIE1hdGNoW10KICByYW5raW5ncyBSYW5raW5nW10KfQoKbW9kZWwgTWF0Y2ggewogIGlkICAgICAgSW50ICAgQGlkIEBkZWZhdWx0KGF1dG9pbmNyZW1lbnQoKSkKICByb3VuZCAgIFJvdW5kIEByZWxhdGlvbihmaWVsZHM6IFtyb3VuZElkXSwgcmVmZXJlbmNlczogW2lkXSkKICByb3VuZElkIEludAoKICB0ZWFtMVBsYXllcjEgICBQbGF5ZXIgQHJlbGF0aW9uKCJUZWFtMVBsYXllcjEiLCBmaWVsZHM6IFt0ZWFtMVBsYXllcjFJZF0sIHJlZmVyZW5jZXM6IFtpZF0pCiAgdGVhbTFQbGF5ZXIxSWQgSW50CgogIHRlYW0xUGxheWVyMiAgIFBsYXllciBAcmVsYXRpb24oIlRlYW0xUGxheWVyMiIsIGZpZWxkczogW3RlYW0xUGxheWVyMklkXSwgcmVmZXJlbmNlczogW2lkXSkKICB0ZWFtMVBsYXllcjJJZCBJbnQKCiAgdGVhbTJQbGF5ZXIxICAgUGxheWVyIEByZWxhdGlvbigiVGVhbTJQbGF5ZXIxIiwgZmllbGRzOiBbdGVhbTJQbGF5ZXIxSWRdLCByZWZlcmVuY2VzOiBbaWRdKQogIHRlYW0yUGxheWVyMUlkIEludAoKICB0ZWFtMlBsYXllcjIgICBQbGF5ZXIgQHJlbGF0aW9uKCJUZWFtMlBsYXllcjIiLCBmaWVsZHM6IFt0ZWFtMlBsYXllcjJJZF0sIHJlZmVyZW5jZXM6IFtpZF0pCiAgdGVhbTJQbGF5ZXIySWQgSW50CgogIHNldHMgICAgICAgU2V0W10KICB3aW5uZXJUZWFtIEludD8gLy8gMSBvciAyCiAgZmluaXNoZWQgICBCb29sZWFuIEBkZWZhdWx0KGZhbHNlKQoKICBAQGluZGV4KFtyb3VuZElkXSkKfQoKbW9kZWwgU2V0IHsKICBpZCAgICAgICAgIEludCAgIEBpZCBAZGVmYXVsdChhdXRvaW5jcmVtZW50KCkpCiAgbWF0Y2ggICAgICBNYXRjaCBAcmVsYXRpb24oZmllbGRzOiBbbWF0Y2hJZF0sIHJlZmVyZW5jZXM6IFtpZF0pCiAgbWF0Y2hJZCAgICBJbnQKICB0ZWFtMVNjb3JlIEludAogIHRlYW0yU2NvcmUgSW50CiAgc2V0TnVtYmVyICBJbnQKCiAgQEB1bmlxdWUoW21hdGNoSWQsIHNldE51bWJlcl0pCiAgQEBpbmRleChbbWF0Y2hJZF0pCn0KCm1vZGVsIFJhbmtpbmcgewogIGlkICAgICAgIEludCAgICBAaWQgQGRlZmF1bHQoYXV0b2luY3JlbWVudCgpKQogIHBsYXllciAgIFBsYXllciBAcmVsYXRpb24oZmllbGRzOiBbcGxheWVySWRdLCByZWZlcmVuY2VzOiBbaWRdKQogIHBsYXllcklkIEludAoKICByb3VuZCAgIFJvdW5kIEByZWxhdGlvbihmaWVsZHM6IFtyb3VuZElkXSwgcmVmZXJlbmNlczogW2lkXSkKICByb3VuZElkIEludAoKICBwb2ludHMgSW50IEBkZWZhdWx0KDApCiAgd2lucyAgIEludCBAZGVmYXVsdCgwKQogIGxvc3NlcyBJbnQgQGRlZmF1bHQoMCkKCiAgQEBpbmRleChbcGxheWVySWRdKQogIEBAaW5kZXgoW3JvdW5kSWRdKQp9Cg%3D%3D
