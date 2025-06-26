@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import { Card } from "./ui/card";
 
 interface Team {
   name: string;
@@ -13,11 +14,11 @@ interface RoundProps {
 
 const Team: FC<Team> = ({ name, playerOne, playerTwo }) => {
   return (
-    <div className="flex flex-col">
+    <Card className="flex flex-col w-[200px] gap-y-0">
       <div>{name}</div>
       <div>{playerOne}</div>
       <div>{playerTwo}</div>
-    </div>
+    </Card>
   );
 };
 
