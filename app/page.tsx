@@ -1,3 +1,5 @@
+"use client";
+
 import CreatePlayerButton from "@/components/CreatePlayerButton";
 import Round from "@/components/Round";
 import { Label } from "@/components/ui/label";
