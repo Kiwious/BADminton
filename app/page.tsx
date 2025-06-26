@@ -1,6 +1,7 @@
 "use client";
 
 import CreatePlayerButton from "@/components/CreatePlayerButton";
+import Leaderboard from "@/components/Leaderboard";
 import Round from "@/components/Round";
 import { Label } from "@/components/ui/label";
 
@@ -94,8 +95,11 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="w-[40%] flex items-end justify-end border-l border-gray-700">
+      
+      <div className="w-[40%] flex flex-col items-end justify-end border-l border-gray-700">
+        <Leaderboard />
         <CreatePlayerButton />
+
       </div>
     </div>
   );
