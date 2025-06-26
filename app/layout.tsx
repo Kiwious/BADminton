@@ -25,13 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <PrismaProvider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <div className="bg-[#1e1e1e] min-h-screen overflow-hidden p-12">
           {children}
-        </body>
-      </PrismaProvider>
+        </div>
+      </body>
     </html>
   );
 }
