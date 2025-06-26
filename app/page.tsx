@@ -3,6 +3,7 @@
 import CreatePlayerButton from "@/components/CreatePlayerButton";
 import Leaderboard from "@/components/Leaderboard";
 import Round from "@/components/Round";
+import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
 export default function Home() {
@@ -33,41 +34,42 @@ export default function Home() {
     },
     {
       teamOne: {
-        name: "Team C",
-        playerOne: "Eve",
-        playerTwo: "Frank",
+        name: "Team E",
+        playerOne: "Ivan",
+        playerTwo: "Judy",
       },
       teamTwo: {
-        name: "Team D",
-        playerOne: "Grace",
-        playerTwo: "Heidi",
+        name: "Team F",
+        playerOne: "Karl",
+        playerTwo: "Lena",
       },
     },
     {
       teamOne: {
-        name: "Team C",
-        playerOne: "Eve",
-        playerTwo: "Frank",
+        name: "Team G",
+        playerOne: "Mallory",
+        playerTwo: "Niaj",
       },
       teamTwo: {
-        name: "Team D",
-        playerOne: "Grace",
-        playerTwo: "Heidi",
+        name: "Team H",
+        playerOne: "Olivia",
+        playerTwo: "Peggy",
       },
     },
     {
       teamOne: {
-        name: "Team C",
-        playerOne: "Eve",
-        playerTwo: "Frank",
+        name: "Team I",
+        playerOne: "Quentin",
+        playerTwo: "Rita",
       },
       teamTwo: {
-        name: "Team D",
-        playerOne: "Grace",
-        playerTwo: "Heidi",
+        name: "Team J",
+        playerOne: "Sybil",
+        playerTwo: "Trent",
       },
     },
   ];
+
   return (
     <div className="size-full flex">
       <div className="w-[60%] flex text-white h-fit justify-center">
@@ -95,11 +97,12 @@ export default function Home() {
           </div>
         </div>
       </div>
-      
-      <div className="w-[40%] flex flex-col items-end justify-end border-l border-gray-700">
-        <Leaderboard />
-        <CreatePlayerButton />
 
+      <div className="w-[40%] flex flex-col items-end justify-start border-l border-gray-700 p-6 gap-y-4">
+        <Card className="w-full p-6 flex flex-col items-center gap-y-4">
+          <Leaderboard />
+        </Card>
+        <CreatePlayerButton />
       </div>
     </div>
   );
